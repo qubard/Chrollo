@@ -7,6 +7,10 @@ I made this to bypass anti-cheats on servers which rely entirely on LUA code exe
 
 If you modify this code this can theoretically be used as a SE bypass too!
 
+# TODO
+
+- Add a `blacklists.txt` file which blacklists the given script names from running.
+
 # Installation
 
 1. Download the latest release from the [releases](https://github.com/qubard/GMOD-Script-Leaker/releases) page or the `bin/` directory.
