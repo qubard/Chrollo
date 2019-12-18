@@ -8,6 +8,7 @@
 #include <sstream>
 #include <fstream>
 #include <direct.h>
+#include <set>
 // We don't need detours--that's for plebs
 
 uintptr_t GetModuleBaseAddress(DWORD procId, const wchar_t* modName) {
@@ -44,7 +45,18 @@ std::string read_string_from_ptr(char* loc) {
 	return out;
 }
 
+void clear_string_ptr(char* loc) {
+	int i = 0;
+	while (*((char*)(loc + i)) != '\0') {
+		*((char*)(loc + i)) = '\0';
+		i++;
+	}
+}
+
 int index = 0;
+
+std::set<std::string> blacklist;
+
 void __stdcall dump_script_buffer() {
 	int root_ptr;
 	__asm {
@@ -82,6 +94,12 @@ void __stdcall dump_script_buffer() {
 			script_name[i] = '_';
 		}
 	}
+
+	if (blacklist.find(script_name) != blacklist.end()) {
+		show_message("Blacklisted " + script_name + "!");
+		clear_string_ptr((char*)buffer_ptr);
+	}
+
 	script_name = "./script_stealer/" + script_name;
 	out.open(script_name, std::fstream::out);
 	out << script_content;
@@ -117,6 +135,21 @@ void hook_dump() {
 	VirtualProtectEx(GetCurrentProcess(), (uintptr_t*)hook_addr, 15, old, &old);
 }
 
+void read_blacklist() {
+	std::ifstream  file;
+	std::string dir = "./script_stealer/blacklist.txt";
+	file.open(dir, std::ifstream::in);
+
+	if (file.fail()) {
+		show_message("Failed to read blacklist in " + dir);
+	}
+
+	std::string line;
+	while (getline(file, line)) {
+		blacklist.emplace(line.c_str());
+	}
+}
+
 BOOL APIENTRY DllMain(HMODULE hModule,
 	DWORD  ul_reason_for_call,
 	LPVOID lpReserved
@@ -126,6 +159,7 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 	{
 	case DLL_PROCESS_ATTACH:
 		_mkdir("./script_stealer");
+		read_blacklist();
 		hook_dump();
 	case DLL_THREAD_ATTACH:
 	case DLL_THREAD_DETACH:

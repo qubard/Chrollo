@@ -7,6 +7,10 @@ I made this to bypass anti-cheats on servers which rely entirely on LUA code exe
 
 If you modify this code this can theoretically be used as a SE bypass too!
 
+# Example directory 
+
+![](https://i.imgur.com/lezn4UT.png)
+
 # Installation
 
 1. Download the latest release from the [releases](https://github.com/qubard/GMOD-Script-Leaker/releases) page or the `bin/` directory.
@@ -15,7 +19,19 @@ If you modify this code this can theoretically be used as a SE bypass too!
 4. Load a multiplayer server.
 5. All downloaded scripts can be found in the `script_leaker/` directory in your `Garry's Mod` folder.
 
-![](https://i.imgur.com/lezn4UT.png)
+# Blacklisting scripts 
+
+In `script_leaker/blacklist.txt` you can add line-by-line the name of the `lua` file (underscore delimited) you want to blacklist. Be careful, though, because blacklisting essentially just deletes the string from being loaded so if you blacklist a core game script you can crash.
+
+You may want to blacklis scripts that are part of an anti-cheat component, for instance.
+
+Sample `blacklist.txt` file:
+
+```
+lua_ray_cl_masquerade.lua
+lua_epoe_client.lua
+addons_1_sgm_lua_gcap_client_gcap_client.lua
+```
 
 # Why use this?
 
@@ -76,7 +92,3 @@ end
 net.Receive("moat-ab",mupload)
 ...
 ```
-
-# TODO
-
-- Add a `blacklists.txt` file which blacklists the given script names from running.
