@@ -1,7 +1,11 @@
 # GMOD-Script-Leaker
-A script stealer I made for Garry's Mod 13. Hooks all incoming scripts that are loaded by the player and writes them to disk with their proper name. Works as of the Nov 20th patch.
+A script stealer I made for Garry's Mod 13 one afternoon. 
 
-I made this to bypass anti-cheats on servers which rely entirely on LUA code execution on the clientside. If you modify this code this can theoretically be used as a SE bypass too!
+It hooks all incoming scripts before they're executed and writes them to disk with their proper name.
+
+I made this to bypass anti-cheats on servers which rely entirely on LUA code execution on the clientside. You can see **every** script your client runs. 
+
+If you modify this code this can theoretically be used as a SE bypass too!
 
 # Installation
 
