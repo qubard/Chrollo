@@ -15,7 +15,7 @@ I made this to bypass anti-cheats on servers which rely entirely on LUA code exe
 
 # Why use this?
 
-You can find a lot of cool stuff with this. I was able to bypass all of [moat.gg](https://moat.gg)'s anticheat which simply took a screenshot of the user's screen, talk about invasion of privacy! Taken from `addons_moat_addons_lua_plugins_moat_modules_snap_client_client.lua`
+You can find a lot of cool stuff with this. I was able to bypass all of [moat.gg](https://moat.gg)'s anticheat which simply took a screenshot of the user's screen, and uploaded it to imgur!
 
 ```lua
 ...
