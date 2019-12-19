@@ -34,12 +34,22 @@ In `script_leaker/blacklist.txt` you can add line-by-line the name of the `lua` 
 
 You may want to blacklist scripts that are part of an anti-cheat component, for instance. Blacklisted scripts do not run.
 
-Sample `blacklist.txt` file:
+Sample `blacklist.txt` file to bypass most TTT anti-cheats
 
 ```
-lua_ray_cl_masquerade.lua
-lua_epoe_client.lua
+addons_moat_addons_lua_plugins_moat_modules_snap_utils.lua
+addons_moat_addons_lua_plugins_moat_modules_snap_init.lua
+addons_moat_addons_lua_plugins_moat_modules_snap_client_menu.lua
+addons_moat_addons_lua_plugins_moat_modules_snap_client_client.lua
 addons_1_sgm_lua_gcap_client_gcap_client.lua
+gamemodes_sandbox_entities_effects_propspawn.lua
+addons_leyscreencap_lua_autorun_client_cl_leyscreencap.lua
+addons_swiftac_lua_swiftac.lua
+addons_ulx_lua_ulx_modules_sh_cc_virus.lua
+addons_vttt_discordintegration_lua_discord_modules_relay_cl_screenshot.lua
+addons_pac3-master_lua_pac3_core_client_parts_censor.lua
+addons_snapper_lua_screensnapper_client.lua
+addons_crescent_lua_crescent_modules_snap_cl_snap.lua
 ```
 
 # Why use this?
