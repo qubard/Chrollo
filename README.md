@@ -1,6 +1,7 @@
 ![](https://i.imgur.com/ikil8Xm.png)
 # Chrollo
-Chrollo is a script interceptor for Garry's Mod 13 made in an afternoon. 
+Chrollo is a script interceptor for Garry's Mod 13 that lets you edit, blacklist and copy scripts before they're run by
+the game client.
 
 # Features
 
