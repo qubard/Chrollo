@@ -1,11 +1,16 @@
-# GMOD-Script-Leaker
-A script stealer I made for Garry's Mod 13 one afternoon. 
+![](https://i.imgur.com/ikil8Xm.png)
+# Chrollo
+Chrollo is a script interceptor for Garry's Mod 13 made in an afternoon. 
 
-It hooks all incoming scripts before they're executed and writes them to disk with their proper name.
+# Features
 
-I made this to bypass anti-cheats on servers which rely entirely on LUA code execution on the clientside. You can see **every** script your client runs. 
+- Dump all loaded clientside scripts to disk
+- Replace/edit loaded scripts
+- Blacklist scripts
 
-If you modify this code this can theoretically be used as a SE bypass too!
+A common use for Chrollo is to bypass anti-cheats on servers which rely entirely on LUA code execution on the clientside. You can see **every** script your client runs. 
+
+If you replace scripts you can theoretically use Chrollo as an SE bypass too.
 
 # Example directory 
 
@@ -19,11 +24,15 @@ If you modify this code this can theoretically be used as a SE bypass too!
 4. Load a multiplayer server.
 5. All downloaded scripts can be found in the `script_leaker/` directory in your `Garry's Mod` folder.
 
+# Replacing scripts
+
+In `script_leaker/replace` save your edited script with the same name (delimited by `_`) as the script you want to edit. That's it, and when you inject Chrollo your script will be replaced.
+
 # Blacklisting scripts 
 
 In `script_leaker/blacklist.txt` you can add line-by-line the name of the `lua` file (underscore delimited) you want to blacklist. Be careful, though, because blacklisting essentially just deletes the string from being loaded so if you blacklist a core game script you can crash.
 
-You may want to blacklis scripts that are part of an anti-cheat component, for instance.
+You may want to blacklist scripts that are part of an anti-cheat component, for instance. Blacklisted scripts do not run.
 
 Sample `blacklist.txt` file:
 
