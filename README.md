@@ -9,11 +9,11 @@ the game client.
 - Replace/edit loaded scripts
 - Blacklist scripts
 
-A common use for Chrollo is to bypass anti-cheats on servers which rely entirely on LUA code execution on the clientside. You can see **every** script your client runs. 
+A common use for Chrollo is to bypass anti-cheats on servers which rely entirely on Lua code execution on the clientside. You can see **every** script your client runs. 
 
-If you replace scripts you can theoretically use Chrollo as an SE bypass too.
+If you replace scripts you can theoretically use Chrollo as an `sv_allowcslua` bypass too since these scripts are executed by the client.
 
-# Example directory 
+# Example dump directory 
 
 ![](https://i.imgur.com/lezn4UT.png)
 
