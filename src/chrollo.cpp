@@ -13,6 +13,8 @@
 // We don't need detours--that's for plebs
 #include "replace.h"
 
+std::set<std::string> blacklist;
+
 uintptr_t GetModuleBaseAddress(DWORD procId, const wchar_t* modName) {
 	uintptr_t modBaseAddr = 0;
 	HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, procId);
@@ -62,10 +64,6 @@ void overwrite_string_ptr(char* loc, std::string data) {
 	loc[data.size()] = '\0';
 }
 
-int index = 0;
-
-std::set<std::string> blacklist;
-
 void __stdcall dump_script_buffer() {
 	char* filename;
 	char* buffer_ptr;
@@ -110,7 +108,7 @@ typedef char byte;
 void hook_dump() {
 	uintptr_t base = GetModuleBaseAddress(GetCurrentProcessId(), L"lua_shared.dll");
 	uintptr_t luaJIT_version_2_0_4 = base + 0x5860;
-	uintptr_t hook_addr = luaJIT_version_2_0_4 + 0x1C2A - 0x02;
+	uintptr_t hook_addr = luaJIT_version_2_0_4 + 0x1C28;
 
 	DWORD old;
 	bool success = VirtualProtectEx(GetCurrentProcess(), (uintptr_t*)hook_addr, 20, PAGE_EXECUTE_READWRITE, &old);
@@ -120,15 +118,15 @@ void hook_dump() {
 	patch_addr++;
 	*((byte*)patch_addr) = 0xE8; // call
 	patch_addr++;
-	*((uintptr_t*)patch_addr) = (uintptr_t)&dump_script_buffer - (uintptr_t)patch_addr - 0x04; // 4 byte offset since it's relative to the start of this instruction
+	*((uintptr_t*)patch_addr) = (uintptr_t)&dump_script_buffer - (uintptr_t)patch_addr - 0x04;
 	patch_addr += 4;
 
-	// POPAD< then patch back with original instructions
+	// POPAD then patch back with original instructions
 	byte patch[12] = { 0x61, 0x8B, 0xCB, 0xff, 0xd0, 0x5f, 0x5e, 0x5b, 0x5d, 0xc2, 0x14, 0x00 };
-
 	for (int i = 0; i < 12; i++) {
 		patch_addr[i] = patch[i];
 	}
+
 	VirtualProtectEx(GetCurrentProcess(), (uintptr_t*)hook_addr, 20, old, &old);
 }
 
@@ -151,8 +149,7 @@ void read_blacklist(std::string root) {
 BOOL APIENTRY DllMain(HMODULE hModule,
 	DWORD  ul_reason_for_call,
 	LPVOID lpReserved
-)
-{
+) {
 	std::string root_dir = "./script_stealer";
 	std::string replace_dir = std::string(root_dir + "/replace");
 	switch (ul_reason_for_call)
@@ -171,4 +168,3 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 	}
 	return TRUE;
 }
-
