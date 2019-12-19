@@ -8,8 +8,10 @@
 #include <sstream>
 #include <fstream>
 #include <direct.h>
+#include <unordered_map>
 #include <set>
 // We don't need detours--that's for plebs
+#include "replace.h"
 
 uintptr_t GetModuleBaseAddress(DWORD procId, const wchar_t* modName) {
 	uintptr_t modBaseAddr = 0;
@@ -45,12 +47,19 @@ std::string read_string_from_ptr(char* loc) {
 	return out;
 }
 
-void clear_string_ptr(char* loc) {
-	int i = 0;
-	while (*((char*)(loc + i)) != '\0') {
-		*((char*)(loc + i)) = '\0';
-		i++;
+void clear_string_ptr(char* loc, size_t size) {
+	for (int i = 0; i < size; i++) {
+		*((char*)(loc + i)) = 0;
 	}
+}
+
+// copy over data into the string at loc
+void overwrite_string_ptr(char* loc, std::string data) {
+	// It's enough to just copy over the string into loc and delimit it with a null terminator
+	for (int i = 0; i < data.size(); i++) {
+		*((char*)(loc + i)) = data[i];
+	}
+	loc[data.size()] = '\0';
 }
 
 int index = 0;
@@ -58,30 +67,15 @@ int index = 0;
 std::set<std::string> blacklist;
 
 void __stdcall dump_script_buffer() {
-	int root_ptr;
+	char* filename;
+	char* buffer_ptr;
 	__asm {
-		mov root_ptr, esi
+		mov buffer_ptr, esi
+		mov filename, ecx
 	}
 
-	int buffer_ptr = root_ptr + 0x34;
-	int filename = root_ptr + 0x04;
-
-	if (0xf < *(int*)(root_ptr + 0x48)) {
-		buffer_ptr = *(int*)buffer_ptr;
-	}
-
-	// some weird filename sanitization check that gets done
-	// cause sometimes filenames are invalid
-	if (0xf < *(int*)(root_ptr + 0x18)) {
-		filename = *(int*)filename;
-	}
-	char* filename2 = (char*)filename + 1;
-	if (*(char*)filename != '!') {
-		filename2 = (char*)filename;
-	}
-
-	std::string script_content = read_string_from_ptr((char*)buffer_ptr);
-	std::string script_name = read_string_from_ptr(filename2);
+	std::string script_content = read_string_from_ptr(buffer_ptr);
+	std::string script_name = read_string_from_ptr(filename);
 
 	if (script_content.find("screenshot_internal") != std::string::npos) {
 		show_message("Found screenshot_internal! " + script_name);
@@ -96,8 +90,10 @@ void __stdcall dump_script_buffer() {
 	}
 
 	if (blacklist.find(script_name) != blacklist.end()) {
-		show_message("Blacklisted " + script_name + "!");
-		clear_string_ptr((char*)buffer_ptr);
+		show_message("Blacklisted " + script_name + "!" + " with size " + std::to_string(strlen(buffer_ptr)));
+		clear_string_ptr(buffer_ptr, script_content.size()); // surprised this region is writable lol
+	} else if (replace_table.find(script_name) != replace_table.end()) {
+		overwrite_string_ptr(buffer_ptr, replace_table[script_name]);
 	}
 
 	script_name = "./script_stealer/" + script_name;
@@ -114,10 +110,10 @@ typedef char byte;
 void hook_dump() {
 	uintptr_t base = GetModuleBaseAddress(GetCurrentProcessId(), L"lua_shared.dll");
 	uintptr_t luaJIT_version_2_0_4 = base + 0x5860;
-	uintptr_t hook_addr = luaJIT_version_2_0_4 + 0x1c30;
+	uintptr_t hook_addr = luaJIT_version_2_0_4 + 0x1C2A - 0x02;
 
 	DWORD old;
-	bool success = VirtualProtectEx(GetCurrentProcess(), (uintptr_t*)hook_addr, 15, PAGE_EXECUTE_READWRITE, &old);
+	bool success = VirtualProtectEx(GetCurrentProcess(), (uintptr_t*)hook_addr, 20, PAGE_EXECUTE_READWRITE, &old);
 
 	byte* patch_addr = (byte*)hook_addr;
 	*((byte*)patch_addr) = 0x60; // PUSHAD
@@ -126,18 +122,20 @@ void hook_dump() {
 	patch_addr++;
 	*((uintptr_t*)patch_addr) = (uintptr_t)&dump_script_buffer - (uintptr_t)patch_addr - 0x04; // 4 byte offset since it's relative to the start of this instruction
 	patch_addr += 4;
-	// RET 0x14
-	patch_addr[0] = 0x61; // POPAD
-	patch_addr[1] = 0xC2;
-	patch_addr[2] = 0x14;
-	patch_addr[3] = 0x00;
 
-	VirtualProtectEx(GetCurrentProcess(), (uintptr_t*)hook_addr, 15, old, &old);
+	// POPAD< then patch back with original instructions
+	byte patch[12] = { 0x61, 0x8B, 0xCB, 0xff, 0xd0, 0x5f, 0x5e, 0x5b, 0x5d, 0xc2, 0x14, 0x00 };
+
+	for (int i = 0; i < 12; i++) {
+		patch_addr[i] = patch[i];
+	}
+	VirtualProtectEx(GetCurrentProcess(), (uintptr_t*)hook_addr, 20, old, &old);
 }
 
-void read_blacklist() {
-	std::ifstream  file;
-	std::string dir = "./script_stealer/blacklist.txt";
+
+void read_blacklist(std::string root) {
+	std::ifstream file;
+	std::string dir = root + "/blacklist.txt";
 	file.open(dir, std::ifstream::in);
 
 	if (file.fail()) {
@@ -155,12 +153,17 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 	LPVOID lpReserved
 )
 {
+	std::string root_dir = "./script_stealer";
+	std::string replace_dir = std::string(root_dir + "/replace");
 	switch (ul_reason_for_call)
 	{
 	case DLL_PROCESS_ATTACH:
-		_mkdir("./script_stealer");
-		read_blacklist();
+		_mkdir(root_dir.c_str());
+		_mkdir(replace_dir.c_str());
+		read_blacklist(root_dir);
+		read_replace_directory(replace_dir);
 		hook_dump();
+		break;
 	case DLL_THREAD_ATTACH:
 	case DLL_THREAD_DETACH:
 	case DLL_PROCESS_DETACH:
