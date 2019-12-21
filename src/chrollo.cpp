@@ -1,4 +1,3 @@
-// dllmain.cpp : Defines the entry point for the DLL application.
 #include "pch.h"
 
 #include <iostream>
@@ -36,7 +35,7 @@ uintptr_t GetModuleBaseAddress(DWORD procId, const wchar_t* modName) {
 
 void show_message(std::string str) {
 	std::wstring wstr = std::wstring(str.begin(), str.end());
-	MessageBox(NULL, wstr.c_str(), L"", MB_OK | MB_SETFOREGROUND);
+	MessageBox(NULL, wstr.c_str(), L"Chrollo", MB_OK | MB_SETFOREGROUND);
 }
 
 std::string read_string_from_ptr(char* loc) {
@@ -75,6 +74,8 @@ void __stdcall dump_script_buffer() {
 	std::string script_content = read_string_from_ptr(buffer_ptr);
 	std::string script_name = read_string_from_ptr(filename);
 	std::string server_name = read_string_from_ptr((char*)(GetModuleBaseAddress(GetCurrentProcessId(), L"client.dll") + 0x6FF0A0));
+	replace_str(server_name, "!", "");
+	replace_str(server_name, "/", "");
 
 	// dump to disk
 	std::fstream out;
