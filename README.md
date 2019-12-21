@@ -13,25 +13,21 @@ A common use for Chrollo is to bypass anti-cheats on servers which rely entirely
 
 If you replace scripts you can theoretically use Chrollo as an `sv_allowcslua` bypass too since these scripts are executed by the client.
 
-# Example dump directory 
-
-![](https://i.imgur.com/lezn4UT.png)
-
 # Installation
 
 1. Download the latest release from the [releases](https://github.com/qubard/GMOD-Script-Leaker/releases) page or the `bin/` directory.
 2. Open Garry's Mod
 3. Inject the `.dll` file into your game.
 4. Load a multiplayer server.
-5. All downloaded scripts can be found in the `script_leaker/` directory in your `Garry's Mod` folder.
+5. All downloaded scripts can be found in the `chrollo/` directory in your `Garry's Mod` folder.
 
 # Replacing scripts
 
-In `script_leaker/replace` save your edited script with the same name (delimited by `_`) as the script you want to edit. That's it, and when you inject Chrollo your script will be replaced.
+In `chrollo/replace` save your edited script with the same name (delimited by `_`) as the script you want to edit. That's it, and when you inject Chrollo your script will be replaced.
 
 # Blacklisting scripts 
 
-In `script_leaker/blacklist.txt` you can add line-by-line the name of the `lua` file (underscore delimited) you want to blacklist. Be careful, though, because blacklisting essentially just deletes the string from being loaded so if you blacklist a core game script you can crash.
+In `chrollo/blacklist.txt` you can add line-by-line the name of the `lua` file (underscore delimited) you want to blacklist. Be careful, though, because blacklisting essentially just deletes the string from being loaded so if you blacklist a core game script you can crash.
 
 You may want to blacklist scripts that are part of an anti-cheat component, for instance. Blacklisted scripts do not run.
 

@@ -74,10 +74,7 @@ void __stdcall dump_script_buffer() {
 
 	std::string script_content = read_string_from_ptr(buffer_ptr);
 	std::string script_name = read_string_from_ptr(filename);
-
-	if (script_content.find("screenshot_internal") != std::string::npos) {
-		show_message("Found screenshot_internal! " + script_name);
-	}
+	std::string server_name = read_string_from_ptr((char*)(GetModuleBaseAddress(GetCurrentProcessId(), L"client.dll") + 0x6FF0A0));
 
 	// dump to disk
 	std::fstream out;
@@ -94,7 +91,8 @@ void __stdcall dump_script_buffer() {
 		overwrite_string_ptr(buffer_ptr, replace_table[script_name]);
 	}
 
-	script_name = "./script_stealer/" + script_name;
+	_mkdir(std::string("./chrollo/" + server_name).c_str());
+	script_name = "./chrollo/" + server_name + "/" + script_name;
 	out.open(script_name, std::fstream::out);
 	out << script_content;
 	if (out.fail()) {
@@ -150,7 +148,7 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 	DWORD  ul_reason_for_call,
 	LPVOID lpReserved
 ) {
-	std::string root_dir = "./script_stealer";
+	std::string root_dir = "./chrollo";
 	std::string replace_dir = std::string(root_dir + "/replace");
 	switch (ul_reason_for_call)
 	{
@@ -168,3 +166,4 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 	}
 	return TRUE;
 }
+
