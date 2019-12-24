@@ -1,17 +1,19 @@
 ![](https://i.imgur.com/ikil8Xm.png)
 # Chrollo
-Chrollo is a script interceptor for Garry's Mod 13 that lets you edit, blacklist and copy scripts before they're run by
+Chrollo is a script hook for Garry's Mod 13 that lets you edit, blacklist and copy scripts before they're run by
 the game client.
 
+A common use for Chrollo is to bypass anti-cheats on servers which rely entirely on Lua code execution on the clientside. You can see **every** script your client runs. 
+
+Chrollo also serves as an script enforcer bypass as well.
+
 # Features
+
+Currently with Chrollo you can
 
 - Dump all loaded clientside scripts to disk
 - Replace/edit loaded scripts
 - Blacklist scripts
-
-A common use for Chrollo is to bypass anti-cheats on servers which rely entirely on Lua code execution on the clientside. You can see **every** script your client runs. 
-
-If you replace scripts you can theoretically use Chrollo as an `sv_allowcslua` bypass too since these scripts are executed by the client.
 
 # Installation
 
