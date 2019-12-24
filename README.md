@@ -5,7 +5,7 @@ the game client.
 
 A common use for Chrollo is to bypass anti-cheats on servers which rely entirely on Lua code execution on the clientside. You can see **every** script your client runs. 
 
-Chrollo also serves as an script enforcer bypass as well.
+Chrollo also serves as a script enforcer bypass as well.
 
 # Features
 
