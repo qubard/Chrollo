@@ -1,11 +1,11 @@
 #include "pch.h"
 
-#include <iostream>
 #include <windows.h>
 #include <TlHelp32.h>
 #include <string>
 #include <sstream>
 #include <fstream>
+#include <algorithm>
 #include <direct.h>
 #include <unordered_map>
 #include <set>
@@ -13,6 +13,7 @@
 #include "replace.h"
 
 std::set<std::string> blacklist;
+std::string last_server_name;
 
 uintptr_t GetModuleBaseAddress(DWORD procId, const wchar_t* modName) {
 	uintptr_t modBaseAddr = 0;
@@ -74,8 +75,13 @@ void __stdcall dump_script_buffer() {
 	std::string script_content = read_string_from_ptr(buffer_ptr);
 	std::string script_name = read_string_from_ptr(filename);
 	std::string server_name = read_string_from_ptr((char*)(GetModuleBaseAddress(GetCurrentProcessId(), L"client.dll") + 0x6FF0A0));
-	replace_str(server_name, "!", "");
-	replace_str(server_name, "/", "");
+
+	// Since we don't have an init server connection hook this will run once
+	if (last_server_name != server_name) {
+		server_name.erase(std::remove_if(server_name.begin(), server_name.end(),
+			[](auto const& c) -> bool { return !std::isalnum(c) && c != ' '; }), server_name.end());
+		last_server_name = server_name;
+	}
 
 	// dump to disk
 	std::fstream out;
@@ -92,8 +98,8 @@ void __stdcall dump_script_buffer() {
 		overwrite_string_ptr(buffer_ptr, replace_table[script_name]);
 	}
 
-	_mkdir(std::string("./chrollo/" + server_name).c_str());
-	script_name = "./chrollo/" + server_name + "/" + script_name;
+	_mkdir(std::string("./chrollo/" + last_server_name).c_str());
+	script_name = "./chrollo/" + last_server_name + "/" + script_name;
 	out.open(script_name, std::fstream::out);
 	out << script_content;
 	if (out.fail()) {
