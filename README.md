@@ -17,11 +17,15 @@ Currently with Chrollo you can
 
 # Installation
 
-1. Download the latest release from the [releases](https://github.com/qubard/GMOD-Script-Leaker/releases) page or the `bin/` directory.
+1. Download the latest release from the [releases](https://github.com/qubard/GMOD-Script-Leaker/releases) page
 2. Open Garry's Mod
 3. Inject the `.dll` file into your game.
 4. Load a multiplayer server.
-5. All downloaded scripts can be found in the `chrollo/` directory in your `Garry's Mod` folder.
+5. All downloaded scripts can be found in the `steamapps/common/GarrysMod/chrollo/<server name>/` directory in your `Garry's Mod` folder.
+
+# Updating
+
+Upon each game version change the only information that needs to be updated is the `server_name` pointer. I'll try to keep each version updated, but it's easy to find the server name pointer with something like CheatEngine (search for the server name as a string in the binary--it's always a static offset).
 
 # Replacing scripts
 
