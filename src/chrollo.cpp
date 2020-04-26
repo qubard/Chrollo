@@ -8,7 +8,7 @@
 #include <direct.h>
 #include <unordered_map>
 #include <regex>
-// We don't need detours--that's for plebs
+
 #include "replace.h"
 
 // A list of regex blacklist patterns
@@ -121,15 +121,15 @@ void __stdcall dump_script_buffer() {
 
 		if (replace_table[script_name].length() > script_content.length()) {
 			// Scripts cant be larger than what is allocated
-			show_message("Replacement script " + script_name + " is too large");
+			std::cout << "Replacement script " + script_name + " is too large" << "\n" << std::flush;
 		}
 
-		show_message("Replaced script " + script_name);
+		std::cout <<  "Replaced script " + script_name << "\n" << std::flush;
 	}
 	else { // check the blacklist
 		for (auto pattern : blacklist) {
 			if (std::regex_search(script_name, pattern)) { // Matches if any substring matches the given pattern
-				show_message("Blacklisted " + script_name + "!" + " with size " + std::to_string(strlen(buffer_ptr)));
+				std::cout << "Blacklisted " + script_name + "!" + " with size " + std::to_string(strlen(buffer_ptr)) << "\n" << std::flush;
 				clear_string_ptr(buffer_ptr, script_content.size());
 				break;
 			}
@@ -141,7 +141,7 @@ void __stdcall dump_script_buffer() {
 	out.open(script_name, std::fstream::out);
 	out << script_content;
 	if (out.fail()) {
-		show_message("Failed to write to " + script_name);
+		std::cout << "Failed to write to " + script_name << std::flush;
 	}
 	out.close();
 }
@@ -222,11 +222,15 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 	DWORD  ul_reason_for_call,
 	LPVOID lpReserved
 ) {
+	FILE* fp = NULL;
 	std::string root_dir = "./chrollo";
 	std::string replace_dir = std::string(root_dir + "/replace");
 	switch (ul_reason_for_call)
 	{
 	case DLL_PROCESS_ATTACH:
+		AllocConsole();
+		freopen_s(&fp, "CONOUT$", "w", stdout);
+
 		_mkdir(root_dir.c_str());
 		_mkdir(replace_dir.c_str());
 		read_blacklist(root_dir);
@@ -236,8 +240,11 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 	case DLL_THREAD_ATTACH:
 	case DLL_THREAD_DETACH:
 	case DLL_PROCESS_DETACH:
+		if (fp != NULL) {
+			fclose(fp);
+			FreeConsole();
+		}
 		break;
 	}
 	return TRUE;
 }
-
