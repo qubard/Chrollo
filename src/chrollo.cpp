@@ -136,8 +136,8 @@ void __stdcall dump_script_buffer() {
 		}
 	}
 
-	_mkdir(std::string("./chrollo/" + last_server_name).c_str());
-	script_name = "./chrollo/" + last_server_name + "/" + script_name;
+	_mkdir(std::string("../gmod_chrollo/" + last_server_name).c_str());
+	script_name = "../gmod_chrollo/" + last_server_name + "/" + script_name;
 	out.open(script_name, std::fstream::out);
 	out << script_content;
 	if (out.fail()) {
@@ -223,7 +223,7 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 	LPVOID lpReserved
 ) {
 	FILE* fp = NULL;
-	std::string root_dir = "./chrollo";
+	std::string root_dir = "../gmod_chrollo/";
 	std::string replace_dir = std::string(root_dir + "/replace");
 	switch (ul_reason_for_call)
 	{
