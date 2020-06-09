@@ -14,7 +14,7 @@
 // A list of regex blacklist patterns
 std::vector<std::regex> blacklist;
 
-typedef char byte;
+typedef uint8_t byte;
 
 void GetModuleBaseAddress(DWORD procId, const wchar_t* modName, uintptr_t* modBaseAddr, uintptr_t* modSize) {
 	HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, procId);
@@ -96,7 +96,7 @@ void __stdcall dump_script_buffer() {
 
 	std::string script_content = read_string_from_ptr(buffer_ptr);
 	std::string script_name = read_string_from_ptr(filename);
-	std::string server_name = read_string_from_ptr((char*)(GetModuleBaseAddress(GetCurrentProcessId(), L"client.dll") + 0x6FF588));
+	std::string server_name = read_string_from_ptr((char*)(GetModuleBaseAddress(GetCurrentProcessId(), L"client.dll") + 0x70275E));
 
 	// Since we don't have an init server connection hook this will run once
 	if (last_server_name != server_name) {
