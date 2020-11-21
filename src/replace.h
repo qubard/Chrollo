@@ -1,7 +1,6 @@
 #pragma once
 
 #include <filesystem>
-#include "trim.h"
 
 std::unordered_map<std::string, std::string> replace_table;
 
